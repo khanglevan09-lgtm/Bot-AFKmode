@@ -94,7 +94,7 @@ function triggerChatWindow(durationMs = 8000) {
 
 app.get('/api/ping', (req, res) => res.send('PONG_OK'));
 
-// ENDPOINT CẬP NHẬT CẤU HÌNH TỰ ĐỘNG (LƯU CHUNG TẤT CẢ)
+// ENDPOINT CẬP NHẬT CẤU HÌNH TỰ ĐỘNG
 app.post('/api/update-config', (req, res) => {
   const { username, password, host } = req.body;
   
@@ -180,12 +180,12 @@ app.get('/', (req, res) => {
     <html lang="vi">
     <head>
       <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
       <title>Kiru Đẹp Trai</title>
       <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
       <style>
         :root {
-          --card-bg: rgba(10, 14, 26, 0.82);
+          --card-bg: rgba(10, 14, 26, 0.85);
           --accent-cyan: #38bdf8;
           --accent-pink: #f43f5e;
           --accent-purple: #c084fc;
@@ -198,7 +198,7 @@ app.get('/', (req, res) => {
         body {
           font-family: 'Plus Jakarta Sans', sans-serif;
           margin: 0;
-          padding: 20px;
+          padding: 16px;
           color: #f8fafc;
           min-height: 100vh;
           background-color: #05070f;
@@ -214,7 +214,7 @@ app.get('/', (req, res) => {
           content: '';
           position: fixed;
           top: 0; left: 0; right: 0; bottom: 0;
-          background: rgba(4, 6, 14, 0.65);
+          background: rgba(4, 6, 14, 0.70);
           backdrop-filter: blur(8px);
           -webkit-backdrop-filter: blur(8px);
           z-index: -1;
@@ -227,52 +227,89 @@ app.get('/', (req, res) => {
           padding-bottom: 15px;
           border-bottom: 2px solid var(--border);
           margin-bottom: 20px;
+          gap: 12px;
+          flex-wrap: wrap;
         }
+
         h1 {
           font-family: 'Orbitron', sans-serif;
-          font-size: 2rem;
+          font-size: 1.8rem;
           margin: 0;
           background: linear-gradient(90deg, #38bdf8, #f43f5e, #c084fc);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           text-shadow: 0 0 20px rgba(244, 63, 94, 0.4);
         }
+
         .container {
           display: grid;
           grid-template-columns: 2fr 1fr;
           gap: 20px;
         }
-        @media (max-width: 1024px) { .container { grid-template-columns: 1fr; } }
-        
+
         .card {
           background: var(--card-bg);
           backdrop-filter: blur(16px);
           -webkit-backdrop-filter: blur(16px);
-          padding: 20px;
+          padding: 18px;
           border-radius: 18px;
           border: 1px solid var(--border);
           box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
           margin-bottom: 20px;
         }
+
         h3 {
           margin-top: 0;
           color: var(--accent-cyan);
-          font-size: 1.15rem;
+          font-size: 1.1rem;
           display: flex;
           align-items: center;
           gap: 8px;
         }
-        .badge-on { background: rgba(74, 222, 128, 0.2); color: #4ade80; border: 1px solid #22c55e; padding: 6px 14px; border-radius: 20px; font-weight: bold; }
-        .badge-off { background: rgba(244, 63, 94, 0.2); color: #f43f5e; border: 1px solid #f43f5e; padding: 6px 14px; border-radius: 20px; font-weight: bold; }
-        .badge-pause { background: rgba(251, 191, 36, 0.2); color: #fbbf24; border: 1px solid #f59e0b; padding: 6px 14px; border-radius: 20px; font-weight: bold; }
+
+        .badge-on { background: rgba(74, 222, 128, 0.2); color: #4ade80; border: 1px solid #22c55e; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; }
+        .badge-off { background: rgba(244, 63, 94, 0.2); color: #f43f5e; border: 1px solid #f43f5e; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; }
+        .badge-pause { background: rgba(251, 191, 36, 0.2); color: #fbbf24; border: 1px solid #f59e0b; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; }
         
-        .chat-box { background: rgba(0, 0, 0, 0.6); padding: 12px; border-radius: 12px; font-family: monospace; height: 220px; overflow-y: auto; color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.2); }
-        .error-box { background: rgba(20, 5, 5, 0.7); padding: 12px; border-radius: 12px; font-family: monospace; height: 220px; overflow-y: auto; color: #f87171; border: 1px solid rgba(244, 63, 94, 0.3); }
-        .kiru-box { background: rgba(15, 23, 15, 0.7); padding: 12px; border-radius: 12px; font-family: monospace; height: 200px; overflow-y: auto; color: #facc15; border: 1px solid rgba(250, 204, 21, 0.3); }
+        /* LƯỚI THÔNG SỐ RESPONSIVE */
+        .status-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+          gap: 10px;
+          margin: 15px 0;
+        }
+
+        .status-item {
+          background: rgba(0, 0, 0, 0.4);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          padding: 10px 12px;
+          border-radius: 12px;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+
+        .status-item .label {
+          font-size: 0.7rem;
+          color: #94a3b8;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          font-weight: 700;
+        }
+
+        .status-item .value {
+          font-size: 0.9rem;
+          font-weight: 600;
+          color: #f8fafc;
+          word-break: break-all;
+        }
+
+        .chat-box { background: rgba(0, 0, 0, 0.6); padding: 12px; border-radius: 12px; font-family: monospace; height: 220px; overflow-y: auto; color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.2); font-size: 0.85rem; }
+        .error-box { background: rgba(20, 5, 5, 0.7); padding: 12px; border-radius: 12px; font-family: monospace; height: 220px; overflow-y: auto; color: #f87171; border: 1px solid rgba(244, 63, 94, 0.3); font-size: 0.85rem; }
+        .kiru-box { background: rgba(15, 23, 15, 0.7); padding: 12px; border-radius: 12px; font-family: monospace; height: 200px; overflow-y: auto; color: #facc15; border: 1px solid rgba(250, 204, 21, 0.3); font-size: 0.85rem; }
         
         .input-group { display: flex; gap: 10px; margin-top: 10px; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
 
         input[type="text"], input[type="password"] { 
           width: 100%; 
@@ -282,11 +319,11 @@ app.get('/', (req, res) => {
           background: rgba(0, 0, 0, 0.5); 
           color: white; 
           outline: none; 
-          font-size: 0.95rem; 
+          font-size: 0.9rem; 
         }
         input:focus { border-color: var(--accent-pink); box-shadow: 0 0 10px rgba(244, 63, 94, 0.4); }
         
-        button { padding: 10px 18px; background: linear-gradient(135deg, #e11d48, #be123c); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; transition: all 0.25s ease; }
+        button { padding: 10px 18px; background: linear-gradient(135deg, #e11d48, #be123c); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; transition: all 0.25s ease; white-space: nowrap; font-size: 0.9rem; }
         button:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(225, 29, 72, 0.5); }
         .btn-stop { background: linear-gradient(135deg, #dc2626, #991b1b) !important; }
         .btn-start { background: linear-gradient(135deg, #16a34a, #15803d) !important; }
@@ -306,7 +343,30 @@ app.get('/', (req, res) => {
           padding: 4px 8px;
         }
         .btn-eye:hover { color: #fff; transform: translateY(-50%); box-shadow: none; }
-        label { font-size: 0.85rem; color: #94a3b8; display: block; margin-bottom: 4px; }
+        label { font-size: 0.8rem; color: #94a3b8; display: block; margin-bottom: 4px; }
+
+        .btn-group-responsive {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+          gap: 10px;
+          margin-top: 15px;
+        }
+
+        /* THIẾT LẬP MEDIA QUERIES TỰ ĐỘNG PHÙ HỢP NỀN TẢNG DI ĐỘNG */
+        @media (max-width: 1024px) {
+          .container { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 600px) {
+          body { padding: 10px; }
+          .header { flex-direction: column; align-items: flex-start; }
+          h1 { font-size: 1.5rem; }
+          .form-grid { grid-template-columns: 1fr; }
+          .input-group { flex-direction: column; }
+          .input-group button { width: 100%; }
+          .btn-group-responsive { grid-template-columns: 1fr; }
+          .card { padding: 14px; }
+        }
       </style>
       <script>
         setInterval(() => { 
@@ -357,23 +417,47 @@ app.get('/', (req, res) => {
           <!-- THÔNG TIN TRẠNG THÁI BOT -->
           <div class="card">
             <h3>Trạng Thái Bot: <span style="color: var(--accent-pink);">${BOT_USERNAME}</span></h3>
-            <p><b>Server:</b> <code>${BOT_HOST}:${BOT_PORT}</code> | <b>Ping:</b> <b style="color: var(--accent-cyan);">${currentPing} ms</b></p>
-            <p><b>Tọa Độ:</b> <code>${currentCoords}</code> | <b>Trang Bị:</b> <code>${currentWeapon}</code></p>
-            <p><b>Thời gian hoạt động:</b> ${uptimeMinutes} phút | <b>RAM:</b> ${memoryUsage} MB</p>
+            
+            <div class="status-grid">
+              <div class="status-item">
+                <span class="label">Server</span>
+                <span class="value"><code>${BOT_HOST}:${BOT_PORT}</code></span>
+              </div>
+              <div class="status-item">
+                <span class="label">Ping</span>
+                <span class="value" style="color: var(--accent-cyan);">${currentPing} ms</span>
+              </div>
+              <div class="status-item">
+                <span class="label">Tọa Độ</span>
+                <span class="value"><code>${currentCoords}</code></span>
+              </div>
+              <div class="status-item">
+                <span class="label">Trang Bị</span>
+                <span class="value"><code>${currentWeapon}</code></span>
+              </div>
+              <div class="status-item">
+                <span class="label">Hoạt Động</span>
+                <span class="value">${uptimeMinutes} phút</span>
+              </div>
+              <div class="status-item">
+                <span class="label">RAM</span>
+                <span class="value">${memoryUsage} MB</span>
+              </div>
+            </div>
 
             <form class="input-group" action="/api/command" method="POST">
               <input type="text" id="cmd-input" name="command" placeholder="Gửi lệnh hoặc chat vào server..." autocomplete="off" required>
               <button type="submit">Gửi</button>
             </form>
 
-            <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+            <div class="btn-group-responsive">
               ${isManualStopped 
-                ? `<a href="/api/toggle-bot" style="text-decoration: none; flex: 1;"><button type="button" class="btn-start" style="width: 100%;">BẬT BOT (KẾT NỐI SERVER)</button></a>`
-                : `<a href="/api/toggle-bot" style="text-decoration: none; flex: 1;"><button type="button" class="btn-stop" style="width: 100%;">TẮT BOT (ĐỂ TỰ VÀO GAME)</button></a>`
+                ? `<a href="/api/toggle-bot" style="text-decoration: none;"><button type="button" class="btn-start" style="width: 100%;">BẬT BOT</button></a>`
+                : `<a href="/api/toggle-bot" style="text-decoration: none;"><button type="button" class="btn-stop" style="width: 100%;">TẮT BOT</button></a>`
               }
-              <a href="/api/clear-error-log" style="text-decoration: none;"><button type="button" class="btn-warning">Xóa Lỗi</button></a>
-              <a href="/api/clear-mention-log" style="text-decoration: none;"><button type="button" class="btn-warning">Mention Log (${botMentionLogs.length})</button></a>
-              <a href="/api/hard-restart" style="text-decoration: none;" onclick="return confirm('Reset toàn bộ Tiến Trình Code?');"><button type="button" class="btn-stop">Reset App</button></a>
+              <a href="/api/clear-error-log" style="text-decoration: none;"><button type="button" class="btn-warning" style="width: 100%;">Xóa Lỗi</button></a>
+              <a href="/api/clear-mention-log" style="text-decoration: none;"><button type="button" class="btn-warning" style="width: 100%;">Mention (${botMentionLogs.length})</button></a>
+              <a href="/api/hard-restart" style="text-decoration: none;" onclick="return confirm('Reset toàn bộ Tiến Trình Code?');"><button type="button" class="btn-stop" style="width: 100%;">Reset App</button></a>
             </div>
           </div>
 
@@ -390,7 +474,7 @@ app.get('/', (req, res) => {
                 <div>
                   <label>Mật Khẩu:</label>
                   <div style="position: relative;">
-                    <input type="password" id="pwd-input" name="password" value="${BOT_PASSWORD}" required autocomplete="off" style="padding-right: 50px;">
+                    <input type="password" id="pwd-input" name="password" value="${BOT_PASSWORD}" required autocomplete="off" style="padding-right: 55px;">
                     <button type="button" class="btn-eye" onclick="togglePasswordVisibility()"><span id="eye-text">Hiện</span></button>
                   </div>
                 </div>
@@ -404,7 +488,7 @@ app.get('/', (req, res) => {
                 <label>IP Server:</label>
                 <input type="text" name="host" value="${BOT_HOST}${BOT_PORT && BOT_PORT !== 25565 ? ':' + BOT_PORT : ''}" required autocomplete="off" placeholder="vangioinetwork.xyz hoặc ip:port">
               </div>
-              <button type="submit" class="btn-save" style="margin-top: 15px;">Lưu Tất Cả Cấu Hình & Tái Kết Nối</button>
+              <button type="submit" class="btn-save">Lưu Cấu Hình & Tái Kết Nối</button>
             </div>
           </form>
 
@@ -421,7 +505,7 @@ app.get('/', (req, res) => {
         <div>
           <div class="card">
             <h3>Lịch Sử Ping</h3>
-            <p><code>${pingLogs.length > 0 ? pingLogs.map(p => `[${p.time}:${p.ping}ms]`).join(' ➔ ') : 'Đang thu thập...'}</code></p>
+            <p style="word-break: break-all;"><code>${pingLogs.length > 0 ? pingLogs.map(p => `[${p.time}:${p.ping}ms]`).join(' ➔ ') : 'Đang thu thập...'}</code></p>
           </div>
 
           <div class="card">
