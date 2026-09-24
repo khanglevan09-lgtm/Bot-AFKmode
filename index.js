@@ -172,7 +172,7 @@ app.get('/', (req, res) => {
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>${BOT_USERNAME} Cyber Control Hub</title>
+      <title>Kiru Đẹp Trai</title>
       <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
       <style>
         :root {
@@ -313,8 +313,7 @@ app.get('/', (req, res) => {
     </head>
     <body>
       <div class="header">
-        <!-- ĐÃ SỬA LỖI CÚ PHÁP TẠI DÒNG NÀY -->
-        <h1>KIRU ĐẸP TRAI CONTROL HUB</h1>
+        <h1>KIRU ĐẸP TRAI</h1>
         <div>${statusBadge}</div>
       </div>
 
