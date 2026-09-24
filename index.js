@@ -94,7 +94,7 @@ function triggerChatWindow(durationMs = 8000) {
 
 app.get('/api/ping', (req, res) => res.send('PONG_OK'));
 
-// ENDPOINT CẬP NHẬT CẤU HÌNH TỰ ĐỘNG
+// ENDPOINT CẬP NHẬT CẤU HÌNH TỰ ĐỘNG (LƯU CHUNG TẤT CẢ)
 app.post('/api/update-config', (req, res) => {
   const { username, password, host } = req.body;
   
@@ -376,10 +376,11 @@ app.get('/', (req, res) => {
             </div>
           </div>
 
-          <!-- FORM 1: ĐĂNG NHẬP -->
-          <div class="card">
-            <h3>🔑 Đăng Nhập</h3>
-            <form action="/api/update-config" method="POST">
+          <!-- FORM DÙNG CHUNG CHO TẤT CẢ CẤU HÌNH -->
+          <form action="/api/update-config" method="POST">
+            <!-- KHU VỰC 1: ĐĂNG NHẬP -->
+            <div class="card">
+              <h3>🔑 Đăng Nhập</h3>
               <div class="form-grid">
                 <div>
                   <label>Tên Nhân Vật:</label>
@@ -393,21 +394,18 @@ app.get('/', (req, res) => {
                   </div>
                 </div>
               </div>
-              <button type="submit" class="btn-save">💾 Lưu Thông Tin Đăng Nhập</button>
-            </form>
-          </div>
+            </div>
 
-          <!-- FORM 2: IP SERVER -->
-          <div class="card">
-            <h3>🌐 IP Server</h3>
-            <form action="/api/update-config" method="POST">
+            <!-- KHU VỰC 2: IP SERVER & NÚT LƯU CHUNG -->
+            <div class="card">
+              <h3>🌐 IP Server</h3>
               <div>
                 <label>IP Server:</label>
                 <input type="text" name="host" value="${BOT_HOST}${BOT_PORT && BOT_PORT !== 25565 ? ':' + BOT_PORT : ''}" required autocomplete="off" placeholder="vangioinetwork.xyz hoặc ip:port">
               </div>
-              <button type="submit" class="btn-save">💾 Cập Nhật IP Server</button>
-            </form>
-          </div>
+              <button type="submit" class="btn-save" style="margin-top: 15px;">💾 Lưu Tất Cả Cấu Hình & Tái Kết Nối</button>
+            </div>
+          </form>
 
           <div class="card">
             <h3>⭐ Nhật Ký Nhắc Tên [${BOT_USERNAME}]</h3>
