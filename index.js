@@ -10,23 +10,11 @@ app.use(express.json());
 // ÉP MÚI GIỜ VIỆT NAM TOÀN HỆ THỐNG
 process.env.TZ = 'Asia/Ho_Chi_Minh';
 
-// --- BẢO MẬT CẤU HÌNH BẰNG BIẾN MÔI TRƯỜNG (ENVIRONMENT VARIABLES) ---
-// Bạn hoặc người dùng có thể cấu hình các biến này trên Render / Replit / Heroku / file .env
-const BOT_USERNAME = process.env.BOT_USERNAME || 'Kiru';
-const BOT_PASSWORD = process.env.BOT_PASSWORD || 'Kiru2000@';
-const BOT_HOST = process.env.BOT_HOST || 'vangioinetwork.xyz';
-const BOT_PORT = parseInt(process.env.BOT_PORT) || 19000;
-
-const OPTIONS = {
-  host: BOT_HOST,
-  port: BOT_PORT,
-  username: BOT_USERNAME,
-  hideErrors: false,
-  checkTimeoutInterval: 60 * 1000, 
-  keepAlive: true,
-  physicsEnabled: true,
-  viewDistance: 'tiny'
-};
+// --- CẤU HÌNH DỘNG (CÓ THỂ THAY ĐỔI TỪ WEB DASHBOARD) ---
+let BOT_USERNAME = process.env.BOT_USERNAME || 'YourBotName';
+let BOT_PASSWORD = process.env.BOT_PASSWORD || 'YourPasswordHere';
+let BOT_HOST = process.env.BOT_HOST || 'mc.example.com';
+let BOT_PORT = parseInt(process.env.BOT_PORT) || 25565;
 
 let bot = null;
 let reconnectTimeout = null;
@@ -34,7 +22,7 @@ let isReconnecting = false;
 let isManualStopped = false; // BẬT/TẮT BOT THỦ CÔNG
 let isFirstSpawn = true;
 
-let currentReconnectDelay = 12000; // Delay 12s để server kịp dọn session
+let currentReconnectDelay = 12000;
 let consecutiveFailures = 0; 
 
 let actionTimeout = null;
@@ -107,6 +95,23 @@ function triggerChatWindow(durationMs = 8000) {
 
 app.get('/api/ping', (req, res) => res.send('PONG_OK'));
 
+// ENDPOINT CẬP NHẬT CẤU HÌNH TÀI KHOẢN TỪ WEB
+app.post('/api/update-config', (req, res) => {
+  const { username, password, host, port: newPort } = req.body;
+  
+  if (username) BOT_USERNAME = username.trim();
+  if (password) BOT_PASSWORD = password.trim();
+  if (host) BOT_HOST = host.trim();
+  if (newPort) BOT_PORT = parseInt(newPort) || 25565;
+
+  addErrorLog('CẤU HÌNH', `Đã cập nhật thông tin Bot [${BOT_USERNAME}]. Đang kết nối lại...`);
+  
+  consecutiveFailures = 0;
+  isManualStopped = false;
+  createBot();
+  res.redirect('/');
+});
+
 app.post('/api/command', (req, res) => {
   if (isManualStopped) return res.send('Bot đang ở trạng thái TẮT thủ công!');
   const cmd = req.body.command;
@@ -137,7 +142,7 @@ app.get('/api/clear-error-log', (req, res) => {
   res.redirect('/');
 });
 
-app.get('/api/clear-kiru-log', (req, res) => {
+app.get('/api/clear-mention-log', (req, res) => {
   botMentionLogs.length = 0;
   res.redirect('/');
 });
@@ -256,23 +261,36 @@ app.get('/', (req, res) => {
         .error-box { background: rgba(20, 5, 5, 0.7); padding: 12px; border-radius: 12px; font-family: monospace; height: 220px; overflow-y: auto; color: #f87171; border: 1px solid rgba(244, 63, 94, 0.3); }
         .kiru-box { background: rgba(15, 23, 15, 0.7); padding: 12px; border-radius: 12px; font-family: monospace; height: 200px; overflow-y: auto; color: #facc15; border: 1px solid rgba(250, 204, 21, 0.3); }
         
-        .input-group { display: flex; gap: 10px; margin-top: 15px; }
-        input[type="text"] { flex: 1; padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.15); background: rgba(0, 0, 0, 0.5); color: white; outline: none; font-size: 1rem; }
-        input[type="text"]:focus { border-color: var(--accent-pink); box-shadow: 0 0 12px rgba(244, 63, 94, 0.4); }
+        .input-group { display: flex; gap: 10px; margin-top: 10px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+
+        input[type="text"], input[type="password"], input[type="number"] { 
+          width: 100%; 
+          padding: 10px 14px; 
+          border-radius: 10px; 
+          border: 1px solid rgba(255, 255, 255, 0.15); 
+          background: rgba(0, 0, 0, 0.5); 
+          color: white; 
+          outline: none; 
+          font-size: 0.95rem; 
+        }
+        input:focus { border-color: var(--accent-pink); box-shadow: 0 0 10px rgba(244, 63, 94, 0.4); }
         
-        button { padding: 12px 20px; background: linear-gradient(135deg, #e11d48, #be123c); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: all 0.25s ease; }
+        button { padding: 10px 18px; background: linear-gradient(135deg, #e11d48, #be123c); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; transition: all 0.25s ease; }
         button:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(225, 29, 72, 0.5); }
         .btn-stop { background: linear-gradient(135deg, #dc2626, #991b1b) !important; }
         .btn-start { background: linear-gradient(135deg, #16a34a, #15803d) !important; }
         .btn-warning { background: linear-gradient(135deg, #d97706, #b45309) !important; }
+        .btn-save { background: linear-gradient(135deg, #0284c7, #0369a1) !important; width: 100%; margin-top: 10px; }
+        label { font-size: 0.85rem; color: #94a3b8; display: block; margin-bottom: 4px; }
       </style>
       <script>
         setInterval(() => { 
-          const input = document.getElementById('cmd-input');
-          if (!input || document.activeElement !== input) { location.reload(); }
+          const activeEl = document.activeElement;
+          if (!activeEl || activeEl.tagName !== 'INPUT') { location.reload(); }
         }, 6000);
 
-        // TẢI ẢNH ANIME NGAY KHI TẢI TRANG VÀ ĐỔI MỖI 60 GIÂY
         async function rotateAnimeBg() {
           try {
             const res = await fetch('https://api.waifu.pics/sfw/waifu');
@@ -287,7 +305,6 @@ app.get('/', (req, res) => {
           } catch (e) {}
         }
         
-        // Gọi hàm tải ảnh ngay lập tức khi mở Web
         window.addEventListener('DOMContentLoaded', () => {
           rotateAnimeBg();
           setInterval(rotateAnimeBg, 60000);
@@ -302,11 +319,12 @@ app.get('/', (req, res) => {
 
       <div class="container">
         <div>
+          <!-- THÔNG TIN TRẠNG THÁI BOT -->
           <div class="card">
             <h3>🎮 Trạng Thái Bot: <span style="color: var(--accent-pink);">${BOT_USERNAME}</span></h3>
-            <p>📶 <b>Ping:</b> <b style="color: var(--accent-cyan);">${currentPing} ms</b> | 📍 <b>Tọa Độ:</b> <code>${currentCoords}</code></p>
-            <p>🗡️ <b>Trang Bị:</b> <code>${currentWeapon}</code> | 📦 <b>Nhặt Vật Phẩm:</b> ${collectedCount} lần</p>
-            <p>⏱️ <b>Uptime:</b> ${uptimeMinutes} phút | 📊 <b>RAM Heap:</b> ${memoryUsage} MB</p>
+            <p>🌐 <b>Server:</b> <code>${BOT_HOST}:${BOT_PORT}</code> | 📶 <b>Ping:</b> <b style="color: var(--accent-cyan);">${currentPing} ms</b></p>
+            <p>📍 <b>Tọa Độ:</b> <code>${currentCoords}</code> | 🗡️ <b>Trang Bị:</b> <code>${currentWeapon}</code></p>
+            <p>📦 <b>Nhặt Vật Phẩm:</b> ${collectedCount} lần | ⏱️ <b>Uptime:</b> ${uptimeMinutes} phút | 📊 <b>RAM:</b> ${memoryUsage} MB</p>
 
             <form class="input-group" action="/api/command" method="POST">
               <input type="text" id="cmd-input" name="command" placeholder="Gửi lệnh hoặc chat vào server..." autocomplete="off" required>
@@ -319,9 +337,35 @@ app.get('/', (req, res) => {
                 : `<a href="/api/toggle-bot" style="text-decoration: none; flex: 1;"><button type="button" class="btn-stop" style="width: 100%;">⏸️ TẮT BOT (ĐỂ TỰ VÀO GAME)</button></a>`
               }
               <a href="/api/clear-error-log" style="text-decoration: none;"><button type="button" class="btn-warning">🧹 Xóa Lỗi</button></a>
-              <a href="/api/clear-kiru-log" style="text-decoration: none;"><button type="button" class="btn-warning">🧹 Mention Log (${botMentionLogs.length})</button></a>
+              <a href="/api/clear-mention-log" style="text-decoration: none;"><button type="button" class="btn-warning">🧹 Mention Log (${botMentionLogs.length})</button></a>
               <a href="/api/hard-restart" style="text-decoration: none;" onclick="return confirm('Reset toàn bộ Tiến Trình Code?');"><button type="button" class="btn-stop">🔄 Reset App</button></a>
             </div>
+          </div>
+
+          <!-- FORM NHẬP TÊN BOT & MẬT KHẨU TRỰC TIẾP TRÊN DASHBOARD -->
+          <div class="card">
+            <h3>⚙️ Cấu Hình Tài Khoản & Server</h3>
+            <form action="/api/update-config" method="POST">
+              <div class="form-grid">
+                <div>
+                  <label>Tên Nhân Vật (Bot Username):</label>
+                  <input type="text" name="username" value="${BOT_USERNAME}" required autocomplete="off">
+                </div>
+                <div>
+                  <label>Mật Khẩu Game (Password):</label>
+                  <input type="password" name="password" value="${BOT_PASSWORD}" required autocomplete="off">
+                </div>
+                <div>
+                  <label>Địa Chỉ Server (Host):</label>
+                  <input type="text" name="host" value="${BOT_HOST}" required autocomplete="off">
+                </div>
+                <div>
+                  <label>Cổng Server (Port):</label>
+                  <input type="number" name="port" value="${BOT_PORT}" required autocomplete="off">
+                </div>
+              </div>
+              <button type="submit" class="btn-save">💾 Lưu Cấu Hình & Tái Kết Nối Bot</button>
+            </form>
           </div>
 
           <div class="card">
@@ -456,10 +500,21 @@ function createBot() {
   lastTimeAge = 0;
   lastTimeAgeUpdate = Date.now();
 
-  console.log(`\n[HỆ THỐNG] Kết nối đến ${OPTIONS.host}:${OPTIONS.port} với tên [${BOT_USERNAME}]...`);
+  const currentOptions = {
+    host: BOT_HOST,
+    port: BOT_PORT,
+    username: BOT_USERNAME,
+    hideErrors: false,
+    checkTimeoutInterval: 60 * 1000, 
+    keepAlive: true,
+    physicsEnabled: true,
+    viewDistance: 'tiny'
+  };
+
+  console.log(`\n[HỆ THỐNG] Kết nối đến ${currentOptions.host}:${currentOptions.port} với tên [${BOT_USERNAME}]...`);
 
   try {
-    bot = mineflayer.createBot(OPTIONS);
+    bot = mineflayer.createBot(currentOptions);
     bot.setMaxListeners(0);
 
     if (bot._client) {
@@ -486,7 +541,6 @@ function createBot() {
 
       loginTimer1 = setTimeout(() => {
         if (bot && bot._client && !isManualStopped) {
-          // THỰC THI LỆNH ĐĂNG NHẬP DÙNG MẬT KHẨU TỪ BIẾN MÔI TRƯỜNG
           bot.chat(`/l ${BOT_PASSWORD}`);
           triggerChatWindow(4000);
         }
