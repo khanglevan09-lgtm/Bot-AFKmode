@@ -166,13 +166,13 @@ app.get('/', (req, res) => {
   const memoryUsage = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2);
   const currentWeapon = (bot && bot.heldItem) ? bot.heldItem.displayName : 'Tay không';
 
-  let statusBadge = '<span class="badge-off">🔴 OFFLINE</span>';
+  let statusBadge = '<span class="badge-off">OFFLINE</span>';
   if (isManualStopped) {
-    statusBadge = '<span class="badge-pause">⏸️ ĐÃ TẮT THỦ CÔNG (NHƯỜNG NICK)</span>';
+    statusBadge = '<span class="badge-pause">ĐÃ TẮT THỦ CÔNG (NHƯỜNG NICK)</span>';
   } else if (bot && bot._client && bot._client.state === 'play') {
-    statusBadge = '<span class="badge-on">🟢 ONLINE</span>';
+    statusBadge = '<span class="badge-on">ONLINE</span>';
   } else {
-    statusBadge = `<span class="badge-off">🔄 RECONNECTING (${Math.round(currentReconnectDelay / 1000)}s)</span>`;
+    statusBadge = `<span class="badge-off">RECONNECTING (${Math.round(currentReconnectDelay / 1000)}s)</span>`;
   }
 
   res.send(`
@@ -299,9 +299,10 @@ app.get('/', (req, res) => {
           transform: translateY(-50%);
           background: transparent;
           border: none;
-          color: #94a3b8;
+          color: var(--accent-cyan);
           cursor: pointer;
-          font-size: 1.1rem;
+          font-size: 0.85rem;
+          font-weight: bold;
           padding: 4px 8px;
         }
         .btn-eye:hover { color: #fff; transform: translateY(-50%); box-shadow: none; }
@@ -329,13 +330,13 @@ app.get('/', (req, res) => {
         
         function togglePasswordVisibility() {
           const pwdInput = document.getElementById('pwd-input');
-          const eyeIcon = document.getElementById('eye-icon');
+          const eyeText = document.getElementById('eye-text');
           if (pwdInput.type === 'password') {
             pwdInput.type = 'text';
-            eyeIcon.textContent = '🙈';
+            eyeText.textContent = 'Ẩn';
           } else {
             pwdInput.type = 'password';
-            eyeIcon.textContent = '👁️';
+            eyeText.textContent = 'Hiện';
           }
         }
 
@@ -355,10 +356,10 @@ app.get('/', (req, res) => {
         <div>
           <!-- THÔNG TIN TRẠNG THÁI BOT -->
           <div class="card">
-            <h3>🎮 Trạng Thái Bot: <span style="color: var(--accent-pink);">${BOT_USERNAME}</span></h3>
-            <p>🌐 <b>Server:</b> <code>${BOT_HOST}:${BOT_PORT}</code> | 📶 <b>Ping:</b> <b style="color: var(--accent-cyan);">${currentPing} ms</b></p>
-            <p>📍 <b>Tọa Độ:</b> <code>${currentCoords}</code> | 🗡️ <b>Trang Bị:</b> <code>${currentWeapon}</code></p>
-            <p>⏱️ <b>Uptime:</b> ${uptimeMinutes} phút | 📊 <b>RAM:</b> ${memoryUsage} MB</p>
+            <h3>Trạng Thái Bot: <span style="color: var(--accent-pink);">${BOT_USERNAME}</span></h3>
+            <p><b>Server:</b> <code>${BOT_HOST}:${BOT_PORT}</code> | <b>Ping:</b> <b style="color: var(--accent-cyan);">${currentPing} ms</b></p>
+            <p><b>Tọa Độ:</b> <code>${currentCoords}</code> | <b>Trang Bị:</b> <code>${currentWeapon}</code></p>
+            <p><b>Thời gian hoạt động:</b> ${uptimeMinutes} phút | <b>RAM:</b> ${memoryUsage} MB</p>
 
             <form class="input-group" action="/api/command" method="POST">
               <input type="text" id="cmd-input" name="command" placeholder="Gửi lệnh hoặc chat vào server..." autocomplete="off" required>
@@ -367,12 +368,12 @@ app.get('/', (req, res) => {
 
             <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
               ${isManualStopped 
-                ? `<a href="/api/toggle-bot" style="text-decoration: none; flex: 1;"><button type="button" class="btn-start" style="width: 100%;">▶️ BẬT BOT (KẾT NỐI SERVER)</button></a>`
-                : `<a href="/api/toggle-bot" style="text-decoration: none; flex: 1;"><button type="button" class="btn-stop" style="width: 100%;">⏸️ TẮT BOT (ĐỂ TỰ VÀO GAME)</button></a>`
+                ? `<a href="/api/toggle-bot" style="text-decoration: none; flex: 1;"><button type="button" class="btn-start" style="width: 100%;">BẬT BOT (KẾT NỐI SERVER)</button></a>`
+                : `<a href="/api/toggle-bot" style="text-decoration: none; flex: 1;"><button type="button" class="btn-stop" style="width: 100%;">TẮT BOT (ĐỂ TỰ VÀO GAME)</button></a>`
               }
-              <a href="/api/clear-error-log" style="text-decoration: none;"><button type="button" class="btn-warning">🧹 Xóa Lỗi</button></a>
-              <a href="/api/clear-mention-log" style="text-decoration: none;"><button type="button" class="btn-warning">🧹 Mention Log (${botMentionLogs.length})</button></a>
-              <a href="/api/hard-restart" style="text-decoration: none;" onclick="return confirm('Reset toàn bộ Tiến Trình Code?');"><button type="button" class="btn-stop">🔄 Reset App</button></a>
+              <a href="/api/clear-error-log" style="text-decoration: none;"><button type="button" class="btn-warning">Xóa Lỗi</button></a>
+              <a href="/api/clear-mention-log" style="text-decoration: none;"><button type="button" class="btn-warning">Mention Log (${botMentionLogs.length})</button></a>
+              <a href="/api/hard-restart" style="text-decoration: none;" onclick="return confirm('Reset toàn bộ Tiến Trình Code?');"><button type="button" class="btn-stop">Reset App</button></a>
             </div>
           </div>
 
@@ -380,7 +381,7 @@ app.get('/', (req, res) => {
           <form action="/api/update-config" method="POST">
             <!-- KHU VỰC 1: ĐĂNG NHẬP -->
             <div class="card">
-              <h3>🔑 Đăng Nhập</h3>
+              <h3>Đăng Nhập</h3>
               <div class="form-grid">
                 <div>
                   <label>Tên Nhân Vật:</label>
@@ -389,8 +390,8 @@ app.get('/', (req, res) => {
                 <div>
                   <label>Mật Khẩu:</label>
                   <div style="position: relative;">
-                    <input type="password" id="pwd-input" name="password" value="${BOT_PASSWORD}" required autocomplete="off" style="padding-right: 40px;">
-                    <button type="button" class="btn-eye" onclick="togglePasswordVisibility()"><span id="eye-icon">👁️</span></button>
+                    <input type="password" id="pwd-input" name="password" value="${BOT_PASSWORD}" required autocomplete="off" style="padding-right: 50px;">
+                    <button type="button" class="btn-eye" onclick="togglePasswordVisibility()"><span id="eye-text">Hiện</span></button>
                   </div>
                 </div>
               </div>
@@ -398,17 +399,17 @@ app.get('/', (req, res) => {
 
             <!-- KHU VỰC 2: IP SERVER & NÚT LƯU CHUNG -->
             <div class="card">
-              <h3>🌐 IP Server</h3>
+              <h3>IP Server</h3>
               <div>
                 <label>IP Server:</label>
                 <input type="text" name="host" value="${BOT_HOST}${BOT_PORT && BOT_PORT !== 25565 ? ':' + BOT_PORT : ''}" required autocomplete="off" placeholder="vangioinetwork.xyz hoặc ip:port">
               </div>
-              <button type="submit" class="btn-save" style="margin-top: 15px;">💾 Lưu Tất Cả Cấu Hình & Tái Kết Nối</button>
+              <button type="submit" class="btn-save" style="margin-top: 15px;">Lưu Tất Cả Cấu Hình & Tái Kết Nối</button>
             </div>
           </form>
 
           <div class="card">
-            <h3>⭐ Nhật Ký Nhắc Tên [${BOT_USERNAME}]</h3>
+            <h3>Nhật Ký Nhắc Tên [${BOT_USERNAME}]</h3>
             <div class="kiru-box">
               ${botMentionLogs.length > 0 
                 ? botMentionLogs.map(k => `<div>[${k.time}]${k.text}</div>`).join('') 
@@ -419,19 +420,19 @@ app.get('/', (req, res) => {
 
         <div>
           <div class="card">
-            <h3>📊 Lịch Sử Ping</h3>
+            <h3>Lịch Sử Ping</h3>
             <p><code>${pingLogs.length > 0 ? pingLogs.map(p => `[${p.time}:${p.ping}ms]`).join(' ➔ ') : 'Đang thu thập...'}</code></p>
           </div>
 
           <div class="card">
-            <h3>💬 Chat Server</h3>
+            <h3>Chat Server</h3>
             <div class="chat-box">
               ${serverChatLogs.length > 0 ? serverChatLogs.map(l => `<div>${l}</div>`).join('') : '<i>Chưa có nhật ký...</i>'}
             </div>
           </div>
 
           <div class="card">
-            <h3>🚨 Nhật Ký Lỗi Phát Sinh</h3>
+            <h3>Nhật Ký Lỗi Phát Sinh</h3>
             <div class="error-box">
               ${errorLogs.length > 0 ? errorLogs.map(e => `<div>[${e.time}] <b>[${e.type}]</b>:${e.details}</div>`).join('') : '<div style="color:var(--accent-green);">Không có lỗi!</div>'}
             </div>
@@ -569,8 +570,8 @@ function createBot() {
   }
 
   bot.on('spawn', () => {
-    console.log('[LOG] ✅ Bot đã vào game!');
-    addChatLog('✅ Kết nối ổn định thành công!');
+    console.log('[LOG] Bot đã vào game!');
+    addChatLog('Kết nối ổn định thành công!');
     triggerChatWindow(12000);
 
     consecutiveFailures = 0;
@@ -648,7 +649,7 @@ function createBot() {
   });
 
   bot.on('death', () => {
-    addChatLog('💀 Bot tử vong! Chờ hồi sinh...');
+    addChatLog('Bot tử vong! Chờ hồi sinh...');
     addErrorLog('Event Chết', 'Bot tử vong');
 
     respawnTimer = setTimeout(() => {
@@ -659,7 +660,7 @@ function createBot() {
       setTimeout(() => {
         if (bot && bot._client && !isManualStopped) {
           bot.chat('/afkmode vao');
-          addChatLog('⌨️ Hồi sinh -> /afkmode vao');
+          addChatLog('Hồi sinh -> /afkmode vao');
           triggerChatWindow(5000);
           scheduleNextAction();
           scheduleRandomRotation();
@@ -733,7 +734,7 @@ function handleReconnect() {
     return;
   }
 
-  console.log(`⏳ Chờ ${currentReconnectDelay / 1000}s để tái kết nối...`);
+  console.log(`Chờ ${currentReconnectDelay / 1000}s để tái kết nối...`);
   
   reconnectTimeout = setTimeout(() => {
     isReconnecting = false;
