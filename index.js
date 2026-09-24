@@ -40,7 +40,6 @@ let isAwaitingResponse = false;
 let isAutoActionRunning = false;
 let lastActionTime = Date.now();
 let currentCoords = 'Đang xác định...';
-let collectedCount = 0;
 let currentPing = 0;
 
 const startTime = Date.now();
@@ -95,16 +94,26 @@ function triggerChatWindow(durationMs = 8000) {
 
 app.get('/api/ping', (req, res) => res.send('PONG_OK'));
 
-// ENDPOINT CẬP NHẬT CẤU HÌNH TÀI KHOẢN TỪ WEB
+// ENDPOINT CẬP NHẬT CẤU HÌNH TỰ ĐỘNG
 app.post('/api/update-config', (req, res) => {
-  const { username, password, host, port: newPort } = req.body;
+  const { username, password, host } = req.body;
   
-  if (username) BOT_USERNAME = username.trim();
-  if (password) BOT_PASSWORD = password.trim();
-  if (host) BOT_HOST = host.trim();
-  if (newPort) BOT_PORT = parseInt(newPort) || 25565;
+  if (username !== undefined) BOT_USERNAME = username.trim();
+  if (password !== undefined) BOT_PASSWORD = password.trim();
+  
+  if (host !== undefined && host.trim() !== '') {
+    let cleanHost = host.trim();
+    if (cleanHost.includes(':')) {
+      const parts = cleanHost.split(':');
+      BOT_HOST = parts[0];
+      BOT_PORT = parseInt(parts[1]) || 25565;
+    } else {
+      BOT_HOST = cleanHost;
+      BOT_PORT = 25565;
+    }
+  }
 
-  addErrorLog('CẤU HÌNH', `Đã cập nhật thông tin Bot [${BOT_USERNAME}]. Đang kết nối lại...`);
+  addErrorLog('CẤU HÌNH', `Đã cập nhật cấu hình Bot [${BOT_USERNAME}]. Đang kết nối lại...`);
   
   consecutiveFailures = 0;
   isManualStopped = false;
@@ -265,7 +274,7 @@ app.get('/', (req, res) => {
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
 
-        input[type="text"], input[type="password"], input[type="number"] { 
+        input[type="text"], input[type="password"] { 
           width: 100%; 
           padding: 10px 14px; 
           border-radius: 10px; 
@@ -283,6 +292,19 @@ app.get('/', (req, res) => {
         .btn-start { background: linear-gradient(135deg, #16a34a, #15803d) !important; }
         .btn-warning { background: linear-gradient(135deg, #d97706, #b45309) !important; }
         .btn-save { background: linear-gradient(135deg, #0284c7, #0369a1) !important; width: 100%; margin-top: 10px; }
+        .btn-eye {
+          position: absolute;
+          right: 6px;
+          top: 50%;
+          transform: translateY(-50%);
+          background: transparent;
+          border: none;
+          color: #94a3b8;
+          cursor: pointer;
+          font-size: 1.1rem;
+          padding: 4px 8px;
+        }
+        .btn-eye:hover { color: #fff; transform: translateY(-50%); box-shadow: none; }
         label { font-size: 0.85rem; color: #94a3b8; display: block; margin-bottom: 4px; }
       </style>
       <script>
@@ -305,6 +327,18 @@ app.get('/', (req, res) => {
           } catch (e) {}
         }
         
+        function togglePasswordVisibility() {
+          const pwdInput = document.getElementById('pwd-input');
+          const eyeIcon = document.getElementById('eye-icon');
+          if (pwdInput.type === 'password') {
+            pwdInput.type = 'text';
+            eyeIcon.textContent = '🙈';
+          } else {
+            pwdInput.type = 'password';
+            eyeIcon.textContent = '👁️';
+          }
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
           rotateAnimeBg();
           setInterval(rotateAnimeBg, 60000);
@@ -324,7 +358,7 @@ app.get('/', (req, res) => {
             <h3>🎮 Trạng Thái Bot: <span style="color: var(--accent-pink);">${BOT_USERNAME}</span></h3>
             <p>🌐 <b>Server:</b> <code>${BOT_HOST}:${BOT_PORT}</code> | 📶 <b>Ping:</b> <b style="color: var(--accent-cyan);">${currentPing} ms</b></p>
             <p>📍 <b>Tọa Độ:</b> <code>${currentCoords}</code> | 🗡️ <b>Trang Bị:</b> <code>${currentWeapon}</code></p>
-            <p>📦 <b>Nhặt Vật Phẩm:</b> ${collectedCount} lần | ⏱️ <b>Uptime:</b> ${uptimeMinutes} phút | 📊 <b>RAM:</b> ${memoryUsage} MB</p>
+            <p>⏱️ <b>Uptime:</b> ${uptimeMinutes} phút | 📊 <b>RAM:</b> ${memoryUsage} MB</p>
 
             <form class="input-group" action="/api/command" method="POST">
               <input type="text" id="cmd-input" name="command" placeholder="Gửi lệnh hoặc chat vào server..." autocomplete="off" required>
@@ -342,29 +376,36 @@ app.get('/', (req, res) => {
             </div>
           </div>
 
-          <!-- FORM NHẬP TÊN BOT & MẬT KHẨU TRỰC TIẾP TRÊN DASHBOARD -->
+          <!-- FORM 1: ĐĂNG NHẬP -->
           <div class="card">
-            <h3>⚙️ Cấu Hình Tài Khoản & Server</h3>
+            <h3>🔑 Đăng Nhập</h3>
             <form action="/api/update-config" method="POST">
               <div class="form-grid">
                 <div>
-                  <label>Tên Nhân Vật (Bot Username):</label>
+                  <label>Tên Nhân Vật:</label>
                   <input type="text" name="username" value="${BOT_USERNAME}" required autocomplete="off">
                 </div>
                 <div>
-                  <label>Mật Khẩu Game (Password):</label>
-                  <input type="password" name="password" value="${BOT_PASSWORD}" required autocomplete="off">
-                </div>
-                <div>
-                  <label>Địa Chỉ Server (Host):</label>
-                  <input type="text" name="host" value="${BOT_HOST}" required autocomplete="off">
-                </div>
-                <div>
-                  <label>Cổng Server (Port):</label>
-                  <input type="number" name="port" value="${BOT_PORT}" required autocomplete="off">
+                  <label>Mật Khẩu:</label>
+                  <div style="position: relative;">
+                    <input type="password" id="pwd-input" name="password" value="${BOT_PASSWORD}" required autocomplete="off" style="padding-right: 40px;">
+                    <button type="button" class="btn-eye" onclick="togglePasswordVisibility()"><span id="eye-icon">👁️</span></button>
+                  </div>
                 </div>
               </div>
-              <button type="submit" class="btn-save">💾 Lưu Cấu Hình & Tái Kết Nối Bot</button>
+              <button type="submit" class="btn-save">💾 Lưu Thông Tin Đăng Nhập</button>
+            </form>
+          </div>
+
+          <!-- FORM 2: IP SERVER -->
+          <div class="card">
+            <h3>🌐 IP Server</h3>
+            <form action="/api/update-config" method="POST">
+              <div>
+                <label>IP Server:</label>
+                <input type="text" name="host" value="${BOT_HOST}${BOT_PORT && BOT_PORT !== 25565 ? ':' + BOT_PORT : ''}" required autocomplete="off" placeholder="vangioinetwork.xyz hoặc ip:port">
+              </div>
+              <button type="submit" class="btn-save">💾 Cập Nhật IP Server</button>
             </form>
           </div>
 
@@ -582,7 +623,7 @@ function createBot() {
       posCheckInterval = setInterval(() => {
         if (bot && bot.entity && bot.entity.position) {
           const pos = bot.entity.position;
-          currentCoords = `X: ${pos.x.toFixed(1)}, Y: ${pos.y.toFixed(1)}, Z: ${pos.z.toFixed(1)}`;
+          currentCoords = `x: ${pos.x.toFixed(1)}, Y: ${pos.y.toFixed(1)}, Z: ${pos.z.toFixed(1)}`;
         }
       }, 5000);
 
@@ -627,14 +668,6 @@ function createBot() {
         }
       }, 4500);
     }, 4000);
-  });
-
-  bot.on('playerCollect', (collector) => {
-    try {
-      if (collector && bot.entity && collector.id === bot.entity.id) {
-        collectedCount++;
-      }
-    } catch (e) {}
   });
 
   bot.on('message', (message) => {
