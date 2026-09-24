@@ -11,7 +11,7 @@ app.use(express.json());
 process.env.TZ = 'Asia/Ho_Chi_Minh';
 
 // --- CẤU HÌNH DỘNG (CÓ THỂ THAY ĐỔI TỪ WEB DASHBOARD) ---
-let BOT_USERNAME = process.env.BOT_USERNAME || 'YourBotName';
+let BOT_USERNAME = process.env.BOT_USERNAME || 'Kiru Đẹp Trai';
 let BOT_PASSWORD = process.env.BOT_PASSWORD || 'YourPasswordHere';
 let BOT_HOST = process.env.BOT_HOST || 'mc.example.com';
 let BOT_PORT = parseInt(process.env.BOT_PORT) || 25565;
@@ -313,7 +313,8 @@ app.get('/', (req, res) => {
     </head>
     <body>
       <div class="header">
-        <h1>${Bot của Kiru Đẹp Trai.toUpperCase()} CONTROL HUB</h1>
+        <!-- ĐÃ SỬA LỖI CÚ PHÁP TẠI DÒNG NÀY -->
+        <h1>KIRU ĐẸP TRAI CONTROL HUB</h1>
         <div>${statusBadge}</div>
       </div>
 
