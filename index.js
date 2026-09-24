@@ -313,7 +313,7 @@ app.get('/', (req, res) => {
     </head>
     <body>
       <div class="header">
-        <h1>✨ ${BOT_USERNAME.toUpperCase()} CONTROL HUB</h1>
+        <h1>${Bot của Kiru Đẹp Trai.toUpperCase()} CONTROL HUB</h1>
         <div>${statusBadge}</div>
       </div>
 
